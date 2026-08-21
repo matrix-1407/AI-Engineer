@@ -1,0 +1,1 @@
+# Day 10 was about creating a Project. the project was to make a Personal LLM chat assistant who will give resume and interview specific answers when asked. The Project is already made and pushed on Github.
