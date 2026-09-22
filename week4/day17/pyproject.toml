@@ -1,0 +1,29 @@
+[project]
+name = "day17"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "matrix-1407", email = "mrudulbokade1407@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "groq>=1.7.0",
+    "langchain-experimental>=0.4.2",
+    "langchain-huggingface>=1.2.2",
+    "langchain-openai>=1.6.3",
+    "langchain-text-splitters>=1.1.2",
+    "numpy>=2.4.6",
+    "pandas>=3.0.6",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+    "qdrant-client>=1.19.1",
+    "sentence-transformers>=6.1.0",
+]
+
+[project.scripts]
+day17 = "day17:main"
+
+[build-system]
+requires = ["uv_build>=0.12.0,<0.13.0"]
+build-backend = "uv_build"
