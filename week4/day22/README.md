@@ -11,7 +11,25 @@ The graph uses Mermaid, so no ASCII layout dependency is required. Open this fil
 ## LangGraph Flow
 
 ```mermaid
-flowchart LR
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "Segoe UI, sans-serif",
+    "fontSize": "18px",
+    "primaryTextColor": "#172554",
+    "lineColor": "#64748b",
+    "clusterBkg": "#f8fafc",
+    "clusterBorder": "#94a3b8"
+  },
+  "flowchart": {
+    "htmlLabels": true,
+    "curve": "basis",
+    "nodeSpacing": 70,
+    "rankSpacing": 90,
+    "padding": 35
+  }
+}}%%
+flowchart TB
   START((Start)):::terminal --> EXTRACT[Extract order with Groq]:::llm
 
   subgraph CHAT[Restaurant conversation]
@@ -59,13 +77,13 @@ flowchart LR
   SERVE -->|failure, no retries| RECOVER
   RECOVER --> APOLOGY --> END
 
-  classDef llm fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:2px
-  classDef review fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
-  classDef process fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
-  classDef retry fill:#ffedd5,stroke:#ea580c,color:#7c2d12,stroke-width:2px
-  classDef success fill:#bbf7d0,stroke:#15803d,color:#14532d,stroke-width:3px
-  classDef failure fill:#fecaca,stroke:#dc2626,color:#7f1d1d,stroke-width:3px
-  classDef terminal fill:#e5e7eb,stroke:#374151,color:#111827,stroke-width:2px
+  classDef llm fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:3px,font-size:18px
+  classDef review fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:3px,font-size:18px
+  classDef process fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:3px,font-size:18px
+  classDef retry fill:#ffedd5,stroke:#ea580c,color:#7c2d12,stroke-width:3px,font-size:18px
+  classDef success fill:#bbf7d0,stroke:#15803d,color:#14532d,stroke-width:4px,font-size:18px
+  classDef failure fill:#fecaca,stroke:#dc2626,color:#7f1d1d,stroke-width:4px,font-size:18px
+  classDef terminal fill:#e5e7eb,stroke:#374151,color:#111827,stroke-width:3px,font-size:18px
 ```
 
 Diagram colors:
