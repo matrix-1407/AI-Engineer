@@ -11,51 +11,71 @@ The graph uses Mermaid, so no ASCII layout dependency is required. Open this fil
 ## LangGraph Flow
 
 ```mermaid
----
-config:
-  flowchart:
-    curve: linear
----
-graph TD;
-        __start__([<p>__start__</p>]):::first
-        extract_order(extract_order)
-        order_confirm(order_confirm)
-        partial_order_decision(partial_order_decision)
-        new_order(new_order)
-        respond_to_user(respond_to_user)
-        get_followup(get_followup)
-        decrement_order_retry(decrement_order_retry)
-        cook(cook)
-        serve(serve)
-        apology(apology)
-        retry_order_after_failure(retry_order_after_failure)
-        prepare_cook_retry(prepare_cook_retry)
-        __end__([<p>__end__</p>]):::last
-        __start__ --> extract_order;
-        cook -.-> retry_order_after_failure;
-        cook -.-> serve;
-        decrement_order_retry --> new_order;
-        extract_order -.-> order_confirm;
-        extract_order -.-> respond_to_user;
-        get_followup --> extract_order;
-        new_order -.-> apology;
-        new_order -.-> extract_order;
-        order_confirm -.-> cook;
-        order_confirm -.-> partial_order_decision;
-        partial_order_decision -.-> cook;
-        partial_order_decision -. &nbsp;new_order&nbsp; .-> decrement_order_retry;
-        prepare_cook_retry --> cook;
-        respond_to_user --> get_followup;
-        retry_order_after_failure --> apology;
-        serve -. &nbsp;end&nbsp; .-> __end__;
-        serve -.-> prepare_cook_retry;
-        serve -.-> retry_order_after_failure;
-        apology --> __end__;
-        cook -.-> cook;
-        classDef default fill:#f2f0ff,line-height:1.2
-        classDef first fill-opacity:0
-        classDef last fill:#bfb6fc
+flowchart LR
+  START((Start)):::terminal --> EXTRACT[Extract order with Groq]:::llm
+
+  subgraph CHAT[Restaurant conversation]
+    EXTRACT -->|question or unrelated| CHAT_REPLY[Answer in restaurant role]:::llm
+    CHAT_REPLY --> FOLLOWUP[Ask for an order]:::llm
+    FOLLOWUP --> EXTRACT
+    REVIEW[Review complete cart]:::review
+    RETRY_ORDER[Order retry available]:::retry
+    ORDER_RETRY[Decrement order retry]:::retry
+    NEW_ORDER[Collect new order]:::llm
+  end
+
+  subgraph ORDER[Order validation]
+    CONFIRM[Check menu and inventory]:::process
+    PARTIAL[Accept partial or reject]:::review
+  end
+
+  subgraph KITCHEN[Kitchen and delivery]
+    COOK[Cook order]:::process
+    COOK_RETRY[Consume cook retry]:::retry
+    SERVE[Serve order]:::process
+    SERVE_RETRY[Consume serve retry]:::retry
+  end
+
+  subgraph FINISH[Terminal states]
+    COMPLETE((Order complete)):::success
+    RECOVER[LLM explains failure]:::retry
+    APOLOGY((Unable to complete)):::failure
+    END((End)):::terminal
+  end
+
+  EXTRACT -->|valid order| REVIEW
+  REVIEW -->|yes| CONFIRM
+  REVIEW -->|no, retries left| ORDER_RETRY --> NEW_ORDER --> EXTRACT
+  REVIEW -->|no retries left| APOLOGY
+  CONFIRM -->|fully available| COOK
+  CONFIRM -->|partial or unavailable| PARTIAL
+  PARTIAL -->|accept partial| COOK
+  PARTIAL -->|reject| ORDER_RETRY
+  COOK -->|success| SERVE
+  COOK -->|failure, retry left| COOK_RETRY --> COOK
+  COOK -->|failure, no retries| RECOVER
+  SERVE -->|success| COMPLETE --> END
+  SERVE -->|failure, retries left| SERVE_RETRY --> COOK
+  SERVE -->|failure, no retries| RECOVER
+  RECOVER --> APOLOGY --> END
+
+  classDef llm fill:#dbeafe,stroke:#2563eb,color:#172554,stroke-width:2px
+  classDef review fill:#fef3c7,stroke:#d97706,color:#78350f,stroke-width:2px
+  classDef process fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
+  classDef retry fill:#ffedd5,stroke:#ea580c,color:#7c2d12,stroke-width:2px
+  classDef success fill:#bbf7d0,stroke:#15803d,color:#14532d,stroke-width:3px
+  classDef failure fill:#fecaca,stroke:#dc2626,color:#7f1d1d,stroke-width:3px
+  classDef terminal fill:#e5e7eb,stroke:#374151,color:#111827,stroke-width:2px
 ```
+
+Diagram colors:
+
+- Blue: Groq and restaurant conversation
+- Yellow: order review and customer decisions
+- Green: inventory, cooking, and serving
+- Orange: retry paths
+- Green endpoint: successful completion
+- Red endpoint: failed order
 
 The CLI also prints the same Mermaid source after each run. The execution log shows the node name, status, order details, and remaining retries.
 
